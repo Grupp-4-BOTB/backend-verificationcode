@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BackendVerificationCode.Application/BackendVerificationCode.Application.csproj" />
+  <Project Path="BackendVerificationCode.Domain/BackendVerificationCode.Domain.csproj" />
+  <Project Path="BackendVerificationCode.Infrastructure/BackendVerificationCode.Infrastructure.csproj" />
+  <Project Path="BackendVerificationCode/BackendVerificationCode.csproj" />
+</Solution>
