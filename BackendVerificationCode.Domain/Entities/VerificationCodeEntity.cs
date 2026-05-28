@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BackendVerificationCode.Domain.Entities;
 
-public class VerificationCode
+public class VerificationCodeEntity
 {
     public int Id { get; set; }                         //ID för den specifika raden i databasen
     public string Code { get; set; } = string.Empty;    // Den 7-siffriga koden

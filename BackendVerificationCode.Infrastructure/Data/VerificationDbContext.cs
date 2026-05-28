@@ -10,7 +10,7 @@ public class VerificationDbContext : DbContext
     }
 
     //Skapar mina tabellet i databasen från min entitys klass
-    public DbSet<VerificationCode> VerificationCodes { get; set; }
+    public DbSet<VerificationCodeEntity> VerificationCodes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
