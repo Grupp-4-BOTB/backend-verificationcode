@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BackendVerificationCode.Application.Interfaces;
 using BackendVerificationCode.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendVerificationCode.Infrastructure.Data;
 
-public class VerificationDbContext : DbContext
+public class VerificationDbContext : DbContext, IVerificationDbContext
 {
     public VerificationDbContext(DbContextOptions<VerificationDbContext> options) : base(options)
     {
