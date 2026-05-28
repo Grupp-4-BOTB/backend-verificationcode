@@ -4,7 +4,7 @@ using System.Text;
 
 namespace BackendVerificationCode.Application.Interfaces;
 
-internal interface IVerificationCode
+public interface IVerificationCodeService
 {
 
     //TEST
