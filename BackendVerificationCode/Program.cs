@@ -1,8 +1,10 @@
 using BackendVerificationCode.API.Swagger;
+using BackendVerificationCode.Application.Services;
 using BackendVerificationCode.Infrastructure.Data;
 using BackendVerificationCode.Security;
 using BackendVerificationCode.Swagger;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,9 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ApiKeyAuthFilter>();
 });
 
+// Hämtar Azure verification code email Connection String från User Secrets
+var azureConnectionString = builder.Configuration["AzureVerificationEmailCode"];
+builder.Services.AddSingleton(new VerificationCodeEmailService(azureConnectionString!));
 
 
 
