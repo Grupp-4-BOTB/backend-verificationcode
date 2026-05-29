@@ -20,3 +20,4 @@ public class VerificationDbContext : DbContext, IVerificationDbContext
         base.OnModelCreating(modelBuilder);
     }
 }
+// lägg till schema

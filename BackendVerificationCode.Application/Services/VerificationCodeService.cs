@@ -1,6 +1,9 @@
 ﻿using BackendVerificationCode.Application.Interfaces;
 using BackendVerificationCode.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Text.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -71,10 +74,51 @@ public class VerificationCodeService : IVerificationCodeService
 
 
     // ValidateCodeAsync
-    // NY KOD NEDAN SOM INTE SPARATS SEN SIST. TITTA IGENOM DEN. 
-
-    public async Task<bool> ValidateCodeAsync(string email, string code)
+    public async Task<bool> ValidateCodeAsync(string code)
     {
+
+        // GABRIELS API ANROP
+        string email = ""; //Här ska mailen som användaren skrev på Gabriels sida sen sparas
+
+        using (var client = new HttpClient())
+        {
+            // Vi lägger till koden i slutet av URL:en (kolla med Gabriel exakt hur hans GET-url ser ut!)
+            var gabrielGetEmailUrl = "https://shiko-identity-webbapi.azurewebsites.net/api/auth/check-email";
+
+            try
+            {
+                var apiResponse = await client.GetAsync(gabrielGetEmailUrl);
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    // Vi hämtar e-postadressen som Gabriel skickar tillbaka
+                    var responseString = await apiResponse.Content.ReadAsStringAsync(); // HÄMTAR ePOSTEN som användare skrev på Gabriels logga in del, och gör om den till en VANLIG sträng
+                    email = responseString; // Sparar här mailen i den tomma "string email" som jag skrev längst upp
+                }
+
+
+                else
+                {
+                    return false; // oM ingen mail finns, skickas false tillbaka
+                }
+            }
+                // FÅNGAR UPP OM SYSTEMET SKULLE KRASHCA
+                catch (Exception)
+                {
+                    return false; 
+                }
+            }
+
+        // GABRIELS API ANROP AVSLUT
+
+
+
+
+
+
+
+
+
 
         // Går in i databasen och hittar det som sparades i CreateCodeAsync,
         // och kontrollerar så allt stämmer. (Att koden inte är använd redan etc)
@@ -99,9 +143,9 @@ public class VerificationCodeService : IVerificationCodeService
         // OCH ANVÄNDAREN GÅR VIDARE
         ConfirmedMatch.IsUsed = true;               //IsUsed är namnet på den boolen för koden i entities.cs
 
-        await _context.SaveChangesAsync();          
+        await _context.SaveChangesAsync();
+
 
         return true;
     }
-
 }
