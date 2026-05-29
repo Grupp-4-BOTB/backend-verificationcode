@@ -21,8 +21,8 @@ public class VerificationCodeService : IVerificationCodeService
 
 
 
-
-    // SKAPA OCH SPARA TILL DATABASEN
+    // CreateCodeAsync
+    // SKAPA OCH SPARA TILL DATABASEN (Kommwr sen gås igenom på sista Asyncen)
     public async Task<string> CreateCodeAsync(string email)
     {
 
@@ -46,10 +46,14 @@ public class VerificationCodeService : IVerificationCodeService
         // Skickar koden till CONTROLLERN
         return generatedCode;
     }
-    
 
-  
 
+
+
+
+
+
+    // SendCodeAsync
     // SKICKA IVÄG KODEN VIA EMAIL TILL ANVÄNDARENS EMAIL
     public async Task SendCodeAsync(string email, string code)
     {
@@ -66,18 +70,38 @@ public class VerificationCodeService : IVerificationCodeService
 
 
 
+    // ValidateCodeAsync
+    // NY KOD NEDAN SOM INTE SPARATS SEN SIST. TITTA IGENOM DEN. 
 
-
-
-
-
-
-
-
-
-
-    public Task<bool> ValidateCodeAsync(string email, string code)
+    public async Task<bool> ValidateCodeAsync(string email, string code)
     {
-        throw new NotImplementedException();
+
+        // Går in i databasen och hittar det som sparades i CreateCodeAsync,
+        // och kontrollerar så allt stämmer. (Att koden inte är använd redan etc)
+        var ConfirmedMatch = await _context.VerificationCodes            //Gå till databasen och jämför CreateCodeAsync - med det nya som användaren skrev in
+            .FirstOrDefaultAsync(x => x.Email == email
+                                   && x.Code == code                    // Matchar siffrorna som användaren skrev in i CreateCodeAsync?
+                                   && x.ExpiresAt > DateTime.UtcNow     // Är dom 2 minuterna fortfarande giltiga? (och inte passerat än) Denna utgår helt från tiden i databasen, där den tyo jämför tiden för NÄR koden skickades ut (kanske 12:00) och då funkar den alltså i 2 minuter fram till 12:02. Om klockan åandra sidan är 12:05 när denna check görs så är koden nu ogiltig. (Det är så jag uppfattar det)
+                                   && !x.IsUsed);                       // är koden (false) oanvänd?
+        // allt ovan har nu stoppats in i variabeln "ConfirmedMatch"
+        // och jämförts med databasens _context.VerificationCodes
+
+
+
+        // OM KODEN ÄR OGILTIG = RETURNERA FALSE
+        if (ConfirmedMatch == null)
+            return false;
+
+
+
+        // OM ANVÄNDAREN SKRIVIT IN RÄTT OCH GILTIG KOD,
+        // SÅ MARKERAS KODEN HÄR SOM ANVÄND (Från false till true) SÅ DEN INTE KAN ANVÄNDAS FLER GÅNGER
+        // OCH ANVÄNDAREN GÅR VIDARE
+        ConfirmedMatch.IsUsed = true;               //IsUsed är namnet på den boolen för koden i entities.cs
+
+        await _context.SaveChangesAsync();          
+
+        return true;
     }
+
 }
