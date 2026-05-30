@@ -56,6 +56,14 @@ public class VerificationCodeService : IVerificationCodeService
 
 
 
+  
+
+
+
+
+
+
+
     // SendCodeAsync
     // SKICKA IVÄG KODEN VIA EMAIL TILL ANVÄNDARENS EMAIL
     public async Task SendCodeAsync(string email, string code)
@@ -146,6 +154,41 @@ public class VerificationCodeService : IVerificationCodeService
         await _context.SaveChangesAsync();
 
 
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+    // GenerateAndSendNewCodeAsync
+    // SKICKA NY KOD TILL ANVÄNDAREN
+    public async Task<bool> GenerateAndSendNewCodeAsync(string email)
+    {
+
+
+        // HITTA DEN GAMLA AKTIVA KODEN I DATABASEN VIA MAILEN
+        var oldCode = await _context.VerificationCodes
+            .FirstOrDefaultAsync(x => x.Email == email && x.IsUsed == false);
+
+        // OM DEN GAMLA KODEN FINNS, SÄTT DEN TILL TRUE (OGILTIG)
+        if (oldCode != null)
+        {
+            oldCode.IsUsed = true;          //Ändrar isUsed boolen i mina entitys så den blir använd
+        }
+
+
+        // SKAPAR EN NY KOD MED MIN CREATECODEASYNC
+        var newCode = await CreateCodeAsync(email);
+
+        // SKICKAR KODEN TILL ANVÄNDARENS MAIL
+        await SendCodeAsync(email, newCode);
+
+        // ALLT OK, skickar iväg till controller
         return true;
     }
 }

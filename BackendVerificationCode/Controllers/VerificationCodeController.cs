@@ -18,6 +18,8 @@ public class VerificationCodeController : ControllerBase
 
 
 
+
+
     //NÄR ANVÄNDAREN SKRIVIT IN KODEN, KÖRS NEDAN
     [HttpPost("verify")]
     public async Task<IActionResult> ValidateCode([FromBody] VerifyCodeEmailDTO request) 
@@ -45,6 +47,40 @@ public class VerificationCodeController : ControllerBase
         // (if (isValid)
         return Ok("Code has been confirmed!");
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // NÄR ANVÄNDAREN KLICKAR PÅ "RESEND VERIFICATION CODE" PÅ FRONTEND AKTIVERAS DENNA
+    [HttpPost("resend")]
+    public async Task<IActionResult> ResendCode([FromBody] VerifyCodeEmailDTO request)
+    {
+
+        // Genererar den NYA koden i await, sparar den i databasen (_codeservice) + anropar min service GenerateAndSendNewCodeAsync + skickar det till mailen som användaren skrev in på gabriels sida
+        var newCodeSentToEmail = await _codeService.GenerateAndSendNewCodeAsync(request.Email);
+
+
+        // NY KOD SKICKADES INTE
+        if (!newCodeSentToEmail)
+        {
+            return BadRequest("Could not resend verification code.");
+        }
+
+
+        //NY KOD SKICKADES
+        return Ok("A new verification code has been sent.");
+    }
+
+
 }
 
 
