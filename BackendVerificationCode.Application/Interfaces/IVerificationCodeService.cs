@@ -9,4 +9,5 @@ public interface IVerificationCodeService
     Task<string> CreateCodeAsync(string email);                 // SKAPA KODEN 
     Task SendCodeAsync(string email, string code);              // sKICKA KODEN TILL ANVÄNDARENS MAIL
     Task<bool> ValidateCodeAsync(string code);                  // Validera att koden som skrivs in är RÄTT
+    Task<bool> GenerateAndSendNewCodeAsync(string email);       // För att genenera/skicka ut en ny kod
 }

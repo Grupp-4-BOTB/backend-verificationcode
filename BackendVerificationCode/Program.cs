@@ -1,4 +1,5 @@
 using BackendVerificationCode.API.Swagger;
+using BackendVerificationCode.Application.Interfaces;
 using BackendVerificationCode.Application.Services;
 using BackendVerificationCode.Infrastructure.Data;
 using BackendVerificationCode.Security;
@@ -34,14 +35,14 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
-// 2 SWAGGER KEY FÖR SÄKERHET
+// DÖRRVAKT FÖR API ANROP (t.ex. swagger authorization samt alla andra API anrop som ber om tillåtelse att komma in i detta projekt)
 builder.Services.Configure<ApiKeyOptions>(builder.Configuration.GetSection("ApiKeyOptions"));
 builder.Services.AddScoped<ApiKeyAuthFilter>();
 
 
 
 
-
+builder.Services.AddScoped<IVerificationCodeService, VerificationCodeService>();
 
 
 
@@ -52,7 +53,7 @@ builder.Services.AddSwagger();
 
 
 
-builder.Services.AddDbContext<VerificationDbContext>(options =>
+builder.Services.AddDbContext <IVerificationDbContext, VerificationDbContext> (options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLAzure")));
 
 
